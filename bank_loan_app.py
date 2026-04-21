@@ -96,20 +96,47 @@ def load_eda_data():
     return None
 
 # Load models
-@st.cache_resource
-def load_models():
+@st.cache_resource(ttl=3600) # Added TTL and will change key to force reset
+def load_models_v2():
+    # Use absolute paths to ensure files are found regardless of how the app is launched
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    clf_path = os.path.join(base_path, 'models', 'classification_pipeline.joblib')
+    reg_path = os.path.join(base_path, 'models', 'regression_pipeline.joblib')
+    
     try:
-        clf = joblib.load('models/classification_pipeline.joblib')
-        reg = joblib.load('models/regression_pipeline.joblib')
+        if not os.path.exists(clf_path) or not os.path.exists(reg_path):
+            return None, None
+            
+        clf = joblib.load(clf_path)
+        reg = joblib.load(reg_path)
         return clf, reg
-    except:
+    except Exception as e:
+        st.error(f"Internal Load Error: {e}")
         return None, None
 
 df_eda = load_eda_data()
-clf_pipeline, reg_pipeline = load_models()
+clf_pipeline, reg_pipeline = load_models_v2()
 
 if not clf_pipeline:
-    st.error("⚠️ AI Models not found. Please run 'train.py' first.")
+    import sklearn
+    import joblib as jl
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    st.error(f"""
+    ⚠️ **AI Underwriting Engine Offline**
+    
+    The cloud environment is having trouble locating the model files.
+    
+    **System Diagnostics:**
+    - **Expected Path**: `{os.path.join(base_path, 'models')}`
+    - **Current Folder Content**: `{os.listdir(base_path)}`
+    - **Sklearn Version**: `{sklearn.__version__}`
+    - **Joblib Version**: `{jl.__version__}`
+    
+    **How to fix:**
+    1. Check if the `models/` folder is visible in your GitHub repository.
+    2. Click **'Reboot App'** in the Streamlit Cloud dashboard.
+    """)
     st.stop()
 
 # Sidebar
