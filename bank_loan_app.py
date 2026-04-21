@@ -19,25 +19,34 @@ st.markdown("""
     
     html, body, [class*="css"] {
         font-family: 'Outfit', sans-serif;
+        color: #f8fafc;
     }
     
     .main {
-        background-color: #f1f5f9;
+        background-color: #0f172a;
+    }
+
+    [data-testid="stAppViewContainer"] {
+        background-color: #0f172a;
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: #1e293b;
     }
     
     .stMetric {
-        background: white;
+        background: #1e293b;
         padding: 24px;
         border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         border-bottom: 4px solid #3b82f6;
     }
     
     .card-container {
-        background: white;
+        background: #1e293b;
         padding: 30px;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         margin-bottom: 25px;
     }
     
@@ -70,6 +79,11 @@ st.markdown("""
         font-size: 14px;
         font-weight: 600;
         opacity: 0.9;
+    }
+
+    /* Force text color for Streamlit components */
+    .stMarkdown, .stSlider, .stNumberInput, .stRadio, .stButton, .stHeader, h1, h2, h3, p, span, label {
+        color: #f8fafc !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -163,7 +177,7 @@ with tabs[0]:
                 }
             }
         ))
-        fig_gauge.update_layout(paper_bgcolor = "rgba(0,0,0,0)", height=300, margin=dict(t=0, b=0))
+        fig_gauge.update_layout(paper_bgcolor = "rgba(0,0,0,0)", height=300, margin=dict(t=0, b=0), template="plotly_dark")
         st.plotly_chart(fig_gauge, use_container_width=True)
         
         if is_eligible == 1:
@@ -193,20 +207,20 @@ with tabs[1]:
             st.markdown("**Credit Score vs. Approval Density**")
             fig1 = px.histogram(df_eda, x="Credit_Score", color="Is_Eligible", 
                                 barmode="overlay", color_discrete_sequence=["#ef4444", "#10b981"],
-                                labels={"Credit_Score": "FICO Score"})
+                                labels={"Credit_Score": "FICO Score"}, template="plotly_dark")
             st.plotly_chart(fig1, use_container_width=True)
             
         with c2:
             st.markdown("**Income Distribution vs. Loan Amount**")
             fig2 = px.scatter(df_eda[df_eda['Is_Eligible']=='Yes'], x="Monthly_Income", y="Loan_Amount", 
                               color="Interest_Rate", size="Age", opacity=0.6,
-                              color_continuous_scale="RdYlGn_r")
+                              color_continuous_scale="RdYlGn_r", template="plotly_dark")
             st.plotly_chart(fig2, use_container_width=True)
             
         st.markdown("**Correlation Matrix of Portfolio Features**")
         numeric_df = df_eda.select_dtypes(include=[np.number])
         corr = numeric_df.corr()
-        fig_corr = px.imshow(corr, text_auto=True, aspect="auto", color_continuous_scale="Blues")
+        fig_corr = px.imshow(corr, text_auto=True, aspect="auto", color_continuous_scale="Blues", template="plotly_dark")
         st.plotly_chart(fig_corr, use_container_width=True)
     else:
         st.warning("Historical data not available for visualization.")
@@ -234,7 +248,7 @@ with tabs[2]:
             
             fig_shap = px.bar(shap_df, x='Impact', y='Feature', orientation='h',
                              color='Impact', color_continuous_scale='RdYlGn',
-                             title="Feature Contribution to Approval")
+                             title="Feature Contribution to Approval", template="plotly_dark")
             st.plotly_chart(fig_shap, use_container_width=True)
             st.caption("How to read: Bars to the right (green) increased approval chance. Bars to the left (red) decreased it.")
             
