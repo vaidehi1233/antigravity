@@ -61,8 +61,8 @@ def train_classification_model(df):
         ('classifier', clf)
     ])
     
-    joblib.dump(full_pipeline, 'models/classification_pipeline.joblib')
-    print("Classification model saved to models/classification_pipeline.joblib")
+    joblib.dump(full_pipeline, 'models/classification_v3.joblib', protocol=4)
+    print("Classification model saved to models/classification_v3.joblib")
     return full_pipeline
 
 def train_regression_models(df):
@@ -103,8 +103,8 @@ def train_regression_models(df):
     print(f"Regression MAE: {mean_absolute_error(y_test, y_pred):.4f}")
     
     # Save Pipeline
-    joblib.dump(reg_pipeline, 'models/regression_pipeline.joblib')
-    print("Regression model saved to models/regression_pipeline.joblib")
+    joblib.dump(reg_pipeline, 'models/regression_v3.joblib', protocol=4)
+    print("Regression model saved to models/regression_v3.joblib")
     return reg_pipeline
 
 if __name__ == "__main__":

@@ -96,26 +96,26 @@ def load_eda_data():
     return None
 
 # Load models
-@st.cache_resource(ttl=3600) # Added TTL and will change key to force reset
-def load_models_v2():
-    # Use absolute paths to ensure files are found regardless of how the app is launched
+# Load models (Cache disabled for troubleshooting)
+def load_models_v3():
     base_path = os.path.dirname(os.path.abspath(__file__))
-    clf_path = os.path.join(base_path, 'models', 'classification_pipeline.joblib')
-    reg_path = os.path.join(base_path, 'models', 'regression_pipeline.joblib')
+    clf_path = os.path.join(base_path, 'models', 'classification_v3.joblib')
+    reg_path = os.path.join(base_path, 'models', 'regression_v3.joblib')
     
     try:
         if not os.path.exists(clf_path) or not os.path.exists(reg_path):
             return None, None
             
+        # Loading with joblib
         clf = joblib.load(clf_path)
         reg = joblib.load(reg_path)
         return clf, reg
     except Exception as e:
-        st.error(f"Internal Load Error: {e}")
+        st.error(f"Internal Load Error (V3): {e}")
         return None, None
 
 df_eda = load_eda_data()
-clf_pipeline, reg_pipeline = load_models_v2()
+clf_pipeline, reg_pipeline = load_models_v3()
 
 if not clf_pipeline:
     import sklearn
@@ -123,19 +123,17 @@ if not clf_pipeline:
     base_path = os.path.dirname(os.path.abspath(__file__))
     
     st.error(f"""
-    ⚠️ **AI Underwriting Engine Offline**
+    ⚠️ **AI Underwriting Engine Offline (V3)**
     
-    The cloud environment is having trouble locating the model files.
+    The cloud environment cannot load the V3 model files.
     
     **System Diagnostics:**
-    - **Expected Path**: `{os.path.join(base_path, 'models')}`
-    - **Current Folder Content**: `{os.listdir(base_path)}`
+    - **Looking for**: `classification_v3.joblib` & `regression_v3.joblib`
+    - **Models Folder Content**: `{os.listdir(os.path.join(base_path, 'models')) if os.path.exists(os.path.join(base_path, 'models')) else 'Folder Missing'}`
     - **Sklearn Version**: `{sklearn.__version__}`
     - **Joblib Version**: `{jl.__version__}`
     
-    **How to fix:**
-    1. Check if the `models/` folder is visible in your GitHub repository.
-    2. Click **'Reboot App'** in the Streamlit Cloud dashboard.
+    **Action**: Please reboot the app in Streamlit Cloud dashboard.
     """)
     st.stop()
 
